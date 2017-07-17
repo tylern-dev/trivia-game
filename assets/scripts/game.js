@@ -49,7 +49,8 @@ var questionArray = [
         question: "Where does the show take place?",
         answer: 'Scranton, OH',
         answerList: ['Scranton, OH', 'Springfield, IL','Provo, UT','Pawnee, IN'],
-        gifURL: 'http://gph.is/Kql6Ul'
+        wrongGifURL: 'https://media.giphy.com/media/neoC4hLSwMPlu/giphy.gif',
+        rightGifURL: 'https://media.giphy.com/media/wmvrrtSZ02lXi/giphy.gif' 
     },
 ]
 
@@ -62,6 +63,7 @@ var scores = [
 ];
 
 var questionTime = 10;
+var questionTimedOut = false;
 var intervalId;
 var questionCount=0; 
 var isAnswerCorrect;
@@ -72,8 +74,9 @@ function questionCountdown(){
     questionTime --;
     $('#time-remaining').html(questionTime);
     if(questionTime === 0){
-        clearInterval(intervalId)
-    }
+        clearInterval(intervalId);
+        outOfTime()
+    } 
 }
 
 function startQuestionTime(){
@@ -87,7 +90,6 @@ function resetTime(){
 // ------------------------------------------
 
 
-
 function question(){
     $('.question-container').removeClass('hidden');
   
@@ -98,7 +100,7 @@ function question(){
 
     //creates buttons for the list of possible answers
     for(var i = 0; i<questionArray[questionCount].answerList.length; i++){
-        $('.question-screen').append('<button>'+questionArray[questionCount].answerList[i]+'</button>');
+        $('.question-screen').append('<button class="btn btn-primary btn-lg btn-block">'+questionArray[questionCount].answerList[i]+'</button>');
     }
 
     //calls nextQuestion() depending on what button was pressed. Hides #question-screen div to dispay the results
@@ -108,7 +110,7 @@ function question(){
             isAnswerCorrect = true;
             $('#question-screen').addClass('hidden');
             $('#correct-answer-screen').removeClass('hidden');
-            $('#right-image').attr('src', questionArray[questionCount].rightGifURL)
+            $('.right-image').attr('src', questionArray[questionCount].rightGifURL)
             nextQuestion();
         } 
         else{
@@ -116,10 +118,22 @@ function question(){
             $('#question-screen').addClass('hidden');
             $('#wrong-answer-screen').removeClass('hidden')
             $('#correct-answer').html(questionArray[questionCount].answer)
-            $('#wrong-image').attr('src', questionArray[questionCount].wrongGifURL)
+            $('.wrong-image').attr('src', questionArray[questionCount].wrongGifURL)
             nextQuestion();
         }
     });
+    console.log(questionTime)
+}
+
+function outOfTime(){
+    questionTimedOut = true;
+    // questionTime = 10;
+    $('#question-screen').addClass('hidden');
+    $('#timeout-screen').removeClass('hidden');
+    $('#out-of-time').html(questionArray[questionCount].answer)
+    $('.right-image').attr('src', questionArray[questionCount].rightGifURL) 
+    // startQuestionTime();
+    nextQuestion();
 }
 
 //this function preps the next question. 
@@ -129,29 +143,42 @@ function nextQuestion(){
         questionCount++;
 
         //hides and shows specific divs depending on how the question was answered -- starts next question()
-        if(isAnswerCorrect){
+        if(questionTimedOut){
+            $('#question-screen').removeClass('hidden');
+            $('#timeout-screen').addClass('hidden');
+            $('button').remove()
+            init();
+        }
+        else if(isAnswerCorrect){
             $('#question-screen').removeClass('hidden');
             $('#correct-answer-screen').addClass('hidden');
             $('button').remove(); //need to remove old answer buttons
-            question()
+            init()
+            
         } else{
             $('#question-screen').removeClass('hidden');
             $('#wrong-answer-screen').addClass('hidden');
             $('button').remove(); //need to remove old answer buttons
-            question();
+            init();
+            
         }
         
-    },1000*5);
+    },1000*5);//5 seconds for the question result page
+}
+
+function init(){
+    clearInterval(intervalId);
+    questionTime = 10;
+    startQuestionTime();
+    question();
 }
 
 //handles the beginning start button.
-function start(){
-    
+function start(){ 
     $('#start-game').on('click', function(event){
         $('.game-start-screen').addClass('hidden');
         question();
     });
-    
 }
 
 

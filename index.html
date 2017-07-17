@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>The Office Trivia</title>
 
-     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
 </head>
+
 <body>
-    
+
 
     <div class="container">
         <h1 class="text-center">The Office Trivia</h1>
         <div class="game-start-screen">
 
-            <button class='start-button' id="start-game">Let's Go!</button>
+            <button class='start-button btn-primary btn-lg center-block' id="start-game">Let's Go!</button>
 
         </div>
 
@@ -30,30 +33,32 @@
             <div class="correct-screen hidden" id="correct-answer-screen">
                 <h1>answer screen</h1>
                 <h2>Correct!!!!</h2>
-                <img src="" alt="" id="right-image">
+                <img src="" alt="" class="right-image">
             </div>
-           
+
             <div class="wrong-screen hidden" id="wrong-answer-screen">
                 <h1>wrong answer</h1>
                 <h2>The correct answer was: <span id='correct-answer'></span></h2>
-                <img src="" alt="" id="wrong-image">
+                <img src="" alt="" class="wrong-image">
             </div>
-            
-            <div id="timeout-screen hidden">
 
+            <div class="timeout-screen hidden" id="timeout-screen">
+                <h1>Out of time!</h1>
+                <h2>the correct answer was: <span id="out-of-time"></span></h2>
+                <img src="" alt="" class="right-image">
             </div>
 
         </div>
-       
+
         <div class="score-screen hidden">
 
         </div>
 
 
     </div>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g="
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g="
         crossorigin="anonymous"></script>
     <script src="assets/scripts/game.js"></script>
 </body>
+
 </html>
