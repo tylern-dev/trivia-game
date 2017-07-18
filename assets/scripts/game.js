@@ -62,13 +62,11 @@ var questionArray = [
 
 ]
 
-var scores = [
-    {
-        correct:0,
-        wrong:0,
-        unanswered:0,
-    }
-];
+var scores = {
+    correct:0,
+    wrong:0,
+    unanswered:0,
+};
 
 var questionTime = 10;
 var timeRunning = false;
