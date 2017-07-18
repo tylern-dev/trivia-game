@@ -52,6 +52,14 @@ var questionArray = [
         wrongGifURL: 'https://media.giphy.com/media/neoC4hLSwMPlu/giphy.gif',
         rightGifURL: 'https://media.giphy.com/media/wmvrrtSZ02lXi/giphy.gif' 
     },
+    {
+        question: "What does Dwight Schrute farm?",
+        answer: 'Beets',
+        answerList: ['Corn', 'Beets','Potatoes','Nothing'],
+        wrongGifURL: 'https://media.giphy.com/media/neoC4hLSwMPlu/giphy.gif',
+        rightGifURL: 'https://media.giphy.com/media/5DfqxlCj2wpfW/giphy.gif' 
+    }
+
 ]
 
 var scores = [
@@ -63,37 +71,61 @@ var scores = [
 ];
 
 var questionTime = 10;
+var timeRunning = false;
 var questionTimedOut = false;
 var intervalId;
 var questionCount=0; 
 var isAnswerCorrect;
 
+//////////////////////////////////
+var gameTimer = {
+    time:10,  
 
-// ---------Timer functions-------------
-function questionCountdown(){
-    questionTime --;
-    $('#time-remaining').html(questionTime);
-    if(questionTime === 0){
-        clearInterval(intervalId);
-        outOfTime()
-    } 
+    restartTime: function(){
+        gameTimer.time = 10;
+    },
+    start: function(){
+        if(!timeRunning){
+            gameTimer.time = 10;
+            intervalID = setInterval(gameTimer.countDown, 1000);
+            timeRunning = true;
+        } 
+    },
+    stop: function(){
+        clearInterval(intervalID);
+        timeRunning = false;
+    },
+    countDown: function(){
+        gameTimer.time--;
+        $('#time-remaining').html(gameTimer.time);
+        if (gameTimer.time === 0){
+            
+            gameTimer.stop();
+            gameTimer.timedOut()
+        }
+    },
+    timedOut: function(){
+        outOfTime();
+    }
 }
+////////////////////////////////////////////
 
-function startQuestionTime(){
-    intervalId = setInterval(questionCountdown, 1000);
+//FIGURE OUT HOW TO END THE GAME///
+function endGame(){
+    if(questionCount > questionArray.length){
+        $('.score-screen').removeClass('hidden');
+        console.log('End of the game!')
+    }
 }
-
-function resetTime(){
-    clearInterval(intervalId);
-    
-}
-// ------------------------------------------
+///////////////////////////////////////////
 
 
 function question(){
     $('.question-container').removeClass('hidden');
   
-    startQuestionTime();
+    //startQuestionTime();
+    gameTimer.start();
+   
 
     //displays the question. questionCount keeps track of what question to use
     $('#question').html(questionArray[questionCount].question); 
@@ -108,6 +140,7 @@ function question(){
         var userSelect = event.currentTarget.innerHTML
         if (userSelect === questionArray[questionCount].answer){
             isAnswerCorrect = true;
+            gameTimer.stop();
             $('#question-screen').addClass('hidden');
             $('#correct-answer-screen').removeClass('hidden');
             $('.right-image').attr('src', questionArray[questionCount].rightGifURL)
@@ -115,6 +148,7 @@ function question(){
         } 
         else{
             isAnswerCorrect = false;
+            gameTimer.stop();
             $('#question-screen').addClass('hidden');
             $('#wrong-answer-screen').removeClass('hidden')
             $('#correct-answer').html(questionArray[questionCount].answer)
@@ -122,17 +156,14 @@ function question(){
             nextQuestion();
         }
     });
-    console.log(questionTime)
 }
 
 function outOfTime(){
     questionTimedOut = true;
-    // questionTime = 10;
     $('#question-screen').addClass('hidden');
     $('#timeout-screen').removeClass('hidden');
     $('#out-of-time').html(questionArray[questionCount].answer)
     $('.right-image').attr('src', questionArray[questionCount].rightGifURL) 
-    // startQuestionTime();
     nextQuestion();
 }
 
@@ -146,38 +177,37 @@ function nextQuestion(){
         if(questionTimedOut){
             $('#question-screen').removeClass('hidden');
             $('#timeout-screen').addClass('hidden');
-            $('button').remove()
+            $('button').remove();
             init();
         }
         else if(isAnswerCorrect){
             $('#question-screen').removeClass('hidden');
             $('#correct-answer-screen').addClass('hidden');
             $('button').remove(); //need to remove old answer buttons
+
             init()
             
         } else{
             $('#question-screen').removeClass('hidden');
             $('#wrong-answer-screen').addClass('hidden');
             $('button').remove(); //need to remove old answer buttons
-            init();
-            
+
+            init();  
         }
-        
     },1000*5);//5 seconds for the question result page
 }
 
 function init(){
-    clearInterval(intervalId);
-    questionTime = 10;
-    startQuestionTime();
+    $('.time-remaining').html('10');
     question();
+    endGame()
 }
 
 //handles the beginning start button.
 function start(){ 
     $('#start-game').on('click', function(event){
         $('.game-start-screen').addClass('hidden');
-        question();
+        init();
     });
 }
 
