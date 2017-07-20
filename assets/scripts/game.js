@@ -215,6 +215,7 @@ function newGame(){
     scores.correct = 0;
     scores.unanswered = 0;
     scores.wrong = 0;
+    $('.congrats').remove();
     $('.scores').remove();
     $('button').remove();
     showQuestion()
