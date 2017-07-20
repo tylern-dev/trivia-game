@@ -1,54 +1,28 @@
-// -------Pseudo Code--------
-//questionTimer
-//answerTimer
-//questionTimeRunning = true/false
-
-//scores
-    // correctAnswer:
-    // wrongAnswer:
-    // unanswers:
-
-//questionArray=[
-//     {
-//         question:
-//         answer:
-//         gifURL:
-//         alerternateAnswers:[]
-
-
-// ]
-
-
-// start game
-//     loop through questions
-//         display question
-//             start question timer
-//             if correct answer
-//                 start answer timer
-//                 display correct screen 
-//                 answer ++
-//             if wrong answer
-//                 start answer timer
-//                 display wrong screen
-//                 wrong ++
-//             if time ends with no answer 
-//                 start answer timer
-//                 display out of time screen
-//                 unanswered ++
+var questionTime = 10;
+var timeRunning = false;
+var questionTimedOut = false;
+var intervalId;
+var questionCount=0; 
+var isAnswerCorrect;
+var lastQuestion = false;
+var hideQuestion = function(){$('#question-screen').addClass('hidden');}
+var showQuestion = function(){$('#question-screen').removeClass('hidden');}
+var hideAnswer = function(){$('#answer-screen').addClass('hidden');}
+var showAnswer = function(){$('#answer-screen').removeClass('hidden');}
 
 
 var questionArray = [
     {
         question: "What is Michael Scott's Middle Name?",
         answer: "Gary",
-        answerList: ["Gary", 'A middle name was never mentioned', 'James', 'Michael'],
+        answerList: ['Gary', 'A middle name was never mentioned', 'James', 'Michael'],
         wrongGifURL:'https://media.giphy.com/media/12XMGIWtrHBl5e/giphy.gif',
         rightGifURL:'https://media.giphy.com/media/MP1kygLQzjCve/giphy.gif'
     },
     {
         question: "Where does the show take place?",
-        answer: 'Scranton, OH',
-        answerList: ['Scranton, OH', 'Springfield, IL','Provo, UT','Pawnee, IN'],
+        answer: 'Scranton, PA',
+        answerList: ['Scranton, PA', 'Springfield, IL','Provo, UT','Pawnee, IN'],
         wrongGifURL: 'https://media.giphy.com/media/neoC4hLSwMPlu/giphy.gif',
         rightGifURL: 'https://media.giphy.com/media/wmvrrtSZ02lXi/giphy.gif' 
     },
@@ -58,9 +32,24 @@ var questionArray = [
         answerList: ['Corn', 'Beets','Potatoes','Nothing'],
         wrongGifURL: 'https://media.giphy.com/media/neoC4hLSwMPlu/giphy.gif',
         rightGifURL: 'https://media.giphy.com/media/5DfqxlCj2wpfW/giphy.gif' 
-    }
+    },
+    {
+        question: "What is the name of Pam and Jim's oldest child?",
+        answer: 'Cecelia',
+        answerList: ['Colette', 'Cecelia','Cece','Camille'],
+        wrongGifURL: 'https://media.giphy.com/media/Yw8ybkgKnKC0E/giphy.gif',
+        rightGifURL: 'https://media.giphy.com/media/13iGPnP5KvvuPS/giphy.gif' 
+    },
+    {
+        question: "Where did Andy graduate from?",
+        answer: 'Cornell University',
+        answerList: ['Penn State', 'Columbia University','Northwestern University','Cornell University'],
+        wrongGifURL: 'https://media.giphy.com/media/4A1am1JlzkJj2/giphy.gif',
+        rightGifURL: 'https://media.giphy.com/media/8VrtCswiLDNnO/giphy.gif' 
+    },
 
 ]
+
 
 var scores = {
     correct:0,
@@ -68,12 +57,6 @@ var scores = {
     unanswered:0,
 };
 
-var questionTime = 10;
-var timeRunning = false;
-var questionTimedOut = false;
-var intervalId;
-var questionCount=0; 
-var isAnswerCorrect;
 
 //////////////////////////////////
 var gameTimer = {
@@ -106,111 +89,153 @@ var gameTimer = {
         outOfTime();
     }
 }
-////////////////////////////////////////////
-
-//FIGURE OUT HOW TO END THE GAME///
-function endGame(){
-    if(questionCount > questionArray.length){
-        $('.score-screen').removeClass('hidden');
-        console.log('End of the game!')
-    }
-}
-///////////////////////////////////////////
-
+////////////////////////////////////////////////////
 
 function question(){
-    $('.question-container').removeClass('hidden');
-  
-    //startQuestionTime();
     gameTimer.start();
-   
+    $('.question-container').removeClass('hidden');
 
-    //displays the question. questionCount keeps track of what question to use
-    $('#question').html(questionArray[questionCount].question); 
-
-    //creates buttons for the list of possible answers
-    for(var i = 0; i<questionArray[questionCount].answerList.length; i++){
+    //loops through question array and displays the question
+    for(var i =0; i<questionArray.length; i++){
+        if(questionCount === i){
+            $('#question').html(questionArray[i].question);
+        }
+    }
+    //loops through answers to dispaly them as buttons
+    for (var i =0; i<questionArray[questionCount].answerList.length; i++){
         $('.question-screen').append('<button class="btn btn-primary btn-lg btn-block">'+questionArray[questionCount].answerList[i]+'</button>');
     }
+    checkAnswer();
+   
 
-    //calls nextQuestion() depending on what button was pressed. Hides #question-screen div to dispay the results
+}
+
+function checkAnswer(){
     $('button').on('click', function(event){
         var userSelect = event.currentTarget.innerHTML
+        hideQuestion();
+        showAnswer();
+        
         if (userSelect === questionArray[questionCount].answer){
             isAnswerCorrect = true;
             gameTimer.stop();
-            $('#question-screen').addClass('hidden');
-            $('#correct-answer-screen').removeClass('hidden');
-            $('.right-image').attr('src', questionArray[questionCount].rightGifURL)
-            nextQuestion();
-        } 
+            $('#header-title').html('Correct!')
+            $('#right-wrong').html('The answer is: '+questionArray[questionCount].answer)
+            $('.gif-image').attr('src', questionArray[questionCount].rightGifURL)
+        }
         else{
             isAnswerCorrect = false;
             gameTimer.stop();
-            $('#question-screen').addClass('hidden');
-            $('#wrong-answer-screen').removeClass('hidden')
-            $('#correct-answer').html(questionArray[questionCount].answer)
-            $('.wrong-image').attr('src', questionArray[questionCount].wrongGifURL)
-            nextQuestion();
+            $('#header-title').html('Wrong Answer!')
+            $('#right-wrong').html('The answer is: '+questionArray[questionCount].answer)
+            $('.gif-image').attr('src', questionArray[questionCount].wrongGifURL)
+            
         }
+        nextQuestion();
     });
 }
 
+//if the time runs out, this function is called
 function outOfTime(){
     questionTimedOut = true;
-    $('#question-screen').addClass('hidden');
-    $('#timeout-screen').removeClass('hidden');
-    $('#out-of-time').html(questionArray[questionCount].answer)
-    $('.right-image').attr('src', questionArray[questionCount].rightGifURL) 
+    hideQuestion()
+    showAnswer()
+    $('#header-title').html('Out of Time!')
+    $('#right-wrong').html('The answer is: '+questionArray[questionCount].answer)
+    $('.gif-image').attr('src', questionArray[questionCount].rightGifURL) 
     nextQuestion();
 }
 
 //this function preps the next question. 
 function nextQuestion(){
-    setTimeout(function(){
-        //increases questionCount so that the next question and answers will be populated
+    setTimeout(function(){  
         questionCount++;
-
-        //hides and shows specific divs depending on how the question was answered -- starts next question()
-        if(questionTimedOut){
-            $('#question-screen').removeClass('hidden');
-            $('#timeout-screen').addClass('hidden');
+        //this if handles last question in array
+        if(questionCount === questionArray.length){
+            if(questionTimedOut){
+                scores.unanswered++;
+            } 
+            else if (isAnswerCorrect){
+                scores.correct++;
+            } else {
+                scores.wrong++;
+            }
+            gameTimer.stop();
+            hideAnswer();
+            $('button').remove();
+            endGame();  
+        }
+        else{
+            if(questionTimedOut){
+                scores.unanswered++;
+            } 
+            else if (isAnswerCorrect){
+                scores.correct++;
+            } else {
+                scores.wrong++;
+            }
+            hideAnswer();
+            showQuestion();
             $('button').remove();
             init();
         }
-        else if(isAnswerCorrect){
-            $('#question-screen').removeClass('hidden');
-            $('#correct-answer-screen').addClass('hidden');
-            $('button').remove(); //need to remove old answer buttons
-
-            init()
-            
-        } else{
-            $('#question-screen').removeClass('hidden');
-            $('#wrong-answer-screen').addClass('hidden');
-            $('button').remove(); //need to remove old answer buttons
-
-            init();  
-        }
-    },1000*5);//5 seconds for the question result page
+       
+    },1000*5);
 }
+//FINSIH THE END GAME
+function endGame(){
+    $('.container').append(
+        '<div class="congrats">Game Over!'+
+        '<div class="scores">You got '+scores.correct+' right!'+
+        '<div class="scores">You got '+scores.wrong+' wrong! :('+
+        '<div class="scores">You didn\'t guess on '+scores.unanswered+'!'
+    );
+    setTimeout(function(){
+        $('.container').append(
+            '<button id="play-again">Play Again?'+
+            '<button id="quit">Quit'
+        );
+    
+    $('button').on('click', function(event){
+        var selection = event.currentTarget.id;
+        
+        if(selection === 'play-again'){
+            newGame();
+        } else{
+            $('.container').empty();
+            alert('Thanks for playing!')
+        }
+    })
+    },1000*3)
+    
+}
+
+function newGame(){
+    questionCount = 0;
+    scores.correct = 0;
+    scores.unanswered = 0;
+    scores.wrong = 0;
+    $('.scores').remove();
+    $('button').remove();
+    showQuestion()
+    question();
+
+}
+
 
 function init(){
+    questionTimedOut = false;
     $('.time-remaining').html('10');
     question();
-    endGame()
 }
 
-//handles the beginning start button.
+               
+
 function start(){ 
     $('#start-game').on('click', function(event){
         $('.game-start-screen').addClass('hidden');
-        init();
+        question();
     });
 }
 
-
 start();
-
-
-
